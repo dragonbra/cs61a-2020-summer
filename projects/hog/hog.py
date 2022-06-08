@@ -1,5 +1,8 @@
 """CS 61A Presents The Game of Hog."""
 
+import this
+
+from numpy import roll, single
 from dice import six_sided, four_sided, make_test_dice
 from ucb import main, trace, interact
 
@@ -121,41 +124,38 @@ def play(strategy0, strategy1, score0=0, score1=0, dice=six_sided,
     who = 0  # Who is about to take a turn, 0 (first) or 1 (second)
     # BEGIN PROBLEM 5
     "*** YOUR CODE HERE ***"
-    last0, last1 = 0, 0 # for feral hog use
+    def do_single_turn(my_score, opponent_score, my_strategy, last_turn_score):
+        """Single play turn.
+        Returns my_score, opponent_score, last_turn_score
+        respectively for corresponding number
+        """
+        roll_dice_num = my_strategy(my_score, opponent_score)
+        this_turn_score = take_turn(roll_dice_num, opponent_score, dice)
 
+        my_score += this_turn_score
+
+        if feral_hogs:
+            if abs(roll_dice_num - last_turn_score) == 2:
+                my_score += 3
+        
+        if is_swap(my_score, opponent_score):
+            my_score, opponent_score = opponent_score, my_score
+        
+        return my_score, opponent_score, this_turn_score, 
+    
+
+    last_turn_score0, last_turn_score1 = 0, 0
+    
     while True:
         if max(score0, score1) >= goal:
             break
 
         if who == 0:
-            num0 = strategy0(score0, score1)
-            this0 = take_turn(num0, score1, dice)
-            score0 += this0
+            score0, score1, last_turn_score0 = do_single_turn(score0, score1, strategy0, last_turn_score0)
+        elif who == 1:
+            score1, score0, last_turn_score1 = do_single_turn(score1, score0, strategy1, last_turn_score1)
 
-            if feral_hogs:
-                if abs(num0 - last0) == 2:
-                    score0 += 3
-            
-            last0 = this0
-
-            if is_swap(score0, score1):
-                score0, score1 = score1, score0
-        else:
-            num1 = strategy1(score1, score0)
-            this1 = take_turn(num1, score0, dice)
-            score1 += this1
-
-            if feral_hogs:
-                if abs(num1 - last1) == 2:
-                    score1 += 3
-
-            last1 = this1
-
-            if is_swap(score1, score0):
-                score0, score1 = score1, score0
-        
         who = other(who)
-        print("DEBUG:", score0, score1)
 
     # END PROBLEM 5
     # (note that the indentation for the problem 6 prompt (***YOUR CODE HERE***) might be misleading)
