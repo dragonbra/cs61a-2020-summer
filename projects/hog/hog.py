@@ -22,6 +22,18 @@ def roll_dice(num_rolls, dice=six_sided):
     assert num_rolls > 0, 'Must roll at least once.'
     # BEGIN PROBLEM 1
     "*** YOUR CODE HERE ***"
+    sum, pig, k = 0, False, 1
+    while k <= num_rolls:
+        now_dice_res = dice()
+        sum += now_dice_res
+        if now_dice_res == 1:
+            pig = True
+        k += 1
+        
+    if pig:
+        return 1
+    else:
+        return sum
     # END PROBLEM 1
 
 
@@ -33,6 +45,7 @@ def free_bacon(score):
     assert score < 100, 'The game should be over.'
     # BEGIN PROBLEM 2
     "*** YOUR CODE HERE ***"
+    return 10 - score % 10 + score // 10
     # END PROBLEM 2
 
 
@@ -51,6 +64,10 @@ def take_turn(num_rolls, opponent_score, dice=six_sided):
     assert opponent_score < 100, 'The game should be over.'
     # BEGIN PROBLEM 3
     "*** YOUR CODE HERE ***"
+    if num_rolls == 0:
+        return free_bacon(opponent_score)
+    else:
+        return roll_dice(num_rolls, dice)
     # END PROBLEM 3
 
 
@@ -60,6 +77,10 @@ def is_swap(player_score, opponent_score):
     """
     # BEGIN PROBLEM 4
     "*** YOUR CODE HERE ***"
+    if abs(player_score % 10 - opponent_score % 10) == opponent_score // 10 % 10:
+        return True
+    else:
+        return False
     # END PROBLEM 4
 
 
@@ -100,6 +121,42 @@ def play(strategy0, strategy1, score0=0, score1=0, dice=six_sided,
     who = 0  # Who is about to take a turn, 0 (first) or 1 (second)
     # BEGIN PROBLEM 5
     "*** YOUR CODE HERE ***"
+    last0, last1 = 0, 0 # for feral hog use
+
+    while True:
+        if max(score0, score1) >= goal:
+            break
+
+        if who == 0:
+            num0 = strategy0(score0, score1)
+            this0 = take_turn(num0, score1, dice)
+            score0 += this0
+
+            if feral_hogs:
+                if abs(num0 - last0) == 2:
+                    score0 += 3
+            
+            last0 = this0
+
+            if is_swap(score0, score1):
+                score0, score1 = score1, score0
+        else:
+            num1 = strategy1(score1, score0)
+            this1 = take_turn(num1, score0, dice)
+            score1 += this1
+
+            if feral_hogs:
+                if abs(num1 - last1) == 2:
+                    score1 += 3
+
+            last1 = this1
+
+            if is_swap(score1, score0):
+                score0, score1 = score1, score0
+        
+        who = other(who)
+        print("DEBUG:", score0, score1)
+
     # END PROBLEM 5
     # (note that the indentation for the problem 6 prompt (***YOUR CODE HERE***) might be misleading)
     # BEGIN PROBLEM 6
