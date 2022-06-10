@@ -1,5 +1,6 @@
 """CS 61A Presents The Game of Hog."""
 
+from operator import is_
 import this
 
 from numpy import roll, single
@@ -299,6 +300,13 @@ def make_averaged(original_function, trials_count=1000):
     """
     # BEGIN PROBLEM 8
     "*** YOUR CODE HERE ***"
+    def averaged_function(*args):
+        total, k = 0, 1
+        while k <= trials_count:
+            total = total + original_function(*args)
+            k += 1
+        return total / trials_count
+    return averaged_function
     # END PROBLEM 8
 
 
@@ -313,6 +321,13 @@ def max_scoring_num_rolls(dice=six_sided, trials_count=1000):
     """
     # BEGIN PROBLEM 9
     "*** YOUR CODE HERE ***"
+    max_result, max_result_num, k = 0, 0, 1
+    while k <= 10:
+        this_result = make_averaged(roll_dice, 1000)(k, dice)
+        if this_result > max_result:
+            max_result, max_result_num = this_result, k
+        k += 1
+    return max_result_num
     # END PROBLEM 9
 
 
@@ -341,13 +356,13 @@ def run_experiments():
         six_sided_max = max_scoring_num_rolls(six_sided)
         print('Max scoring num rolls for six-sided dice:', six_sided_max)
 
-    if False:  # Change to True to test always_roll(8)
+    if True:  # Change to True to test always_roll(8)
         print('always_roll(8) win rate:', average_win_rate(always_roll(8)))
 
-    if False:  # Change to True to test bacon_strategy
+    if True:  # Change to True to test bacon_strategy
         print('bacon_strategy win rate:', average_win_rate(bacon_strategy))
 
-    if False:  # Change to True to test swap_strategy
+    if True:  # Change to True to test swap_strategy
         print('swap_strategy win rate:', average_win_rate(swap_strategy))
 
     if False:  # Change to True to test final_strategy
@@ -362,7 +377,7 @@ def bacon_strategy(score, opponent_score, cutoff=8, num_rolls=6):
     rolls NUM_ROLLS otherwise.
     """
     # BEGIN PROBLEM 10
-    return 6  # Replace this statement
+    return 0 if free_bacon(opponent_score) >= cutoff else num_rolls
     # END PROBLEM 10
 
 
@@ -372,7 +387,9 @@ def swap_strategy(score, opponent_score, cutoff=8, num_rolls=6):
     non-beneficial swap. Otherwise, it rolls NUM_ROLLS.
     """
     # BEGIN PROBLEM 11
-    return 6  # Replace this statement
+    return 0 if (is_swap(score + free_bacon(opponent_score), opponent_score) and score + free_bacon(opponent_score) < opponent_score) or \
+                (free_bacon(opponent_score) >= cutoff and not is_swap(score + free_bacon(opponent_score), opponent_score)) \
+             else num_rolls
     # END PROBLEM 11
 
 
