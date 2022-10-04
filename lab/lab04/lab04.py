@@ -10,7 +10,10 @@ def reverse_iter(lst):
     >>> cleaned = re.sub(r"#.*\\n", '', re.sub(r'"{3}[\s\S]*?"{3}', '', inspect.getsource(reverse_iter)))
     >>> print("Do not use lst[::-1], lst.reverse(), or reversed(lst)!") if any([r in cleaned for r in ["[::", ".reverse", "reversed"]]) else None
     """
-    "*** YOUR CODE HERE ***"
+    res = []
+    for i in range(len(lst) - 1, -1, -1):
+        res.append(lst[i])
+    return res
 
 
 def reverse_recursive(lst):
@@ -22,7 +25,10 @@ def reverse_recursive(lst):
     >>> cleaned = re.sub(r"#.*\\n", '', re.sub(r'"{3}[\s\S]*?"{3}', '', inspect.getsource(reverse_recursive)))
     >>> print("Do not use lst[::-1], lst.reverse(), or reversed(lst)!") if any([r in cleaned for r in ["[::", ".reverse", "reversed"]]) else None
     """
-    "*** YOUR CODE HERE ***"
+    if len(lst) <= 1:
+        return lst
+    else:
+        return lst[len(lst) - 1:] + reverse_iter(lst[:len(lst) - 1])
 
 
 from math import sqrt
@@ -37,7 +43,10 @@ def distance(city_a, city_b):
     >>> distance(city_c, city_d)
     5.0
     """
-    "*** YOUR CODE HERE ***"
+    x1, y1 = get_lat(city_a), get_lon(city_a)
+    x2, y2 = get_lat(city_b), get_lon(city_b)
+
+    return sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)
 
 def closer_city(lat, lon, city_a, city_b):
     """
@@ -53,7 +62,14 @@ def closer_city(lat, lon, city_a, city_b):
     >>> closer_city(41.29, 174.78, bucharest, vienna)
     'Bucharest'
     """
-    "*** YOUR CODE HERE ***"
+    node = make_city('node', lat, lon)
+    dis_a = distance(node, city_a)
+    dis_b = distance(node, city_b)
+
+    if dis_a < dis_b:
+        return get_name(city_a)
+    else:
+        return get_name(city_b)
 
 def check_abstraction():
     """
@@ -161,5 +177,11 @@ def add_chars(w1, w2):
     ...       ['For', 'While', 'Set', 'SetComp']) # Must use recursion
     True
     """
-    "*** YOUR CODE HERE ***"
+    if w1 == "":
+        return w2
+
+    if w1[0] == w2[0]:
+        return add_chars(w1[1:], w2[1:])
+    else:
+        return w2[0] + add_chars(w1, w2[1:])
 
