@@ -16,7 +16,11 @@ def choose(paragraphs, select, k):
     the empty string.
     """
     # BEGIN PROBLEM 1
-    "*** YOUR CODE HERE ***"
+    qualified = [paragraph for paragraph in paragraphs if select(paragraph)]
+    if k < len(qualified):
+        return qualified[k]
+    else:
+        return ''
     # END PROBLEM 1
 
 
@@ -32,7 +36,14 @@ def about(topic):
     """
     assert all([lower(x) == x for x in topic]), 'topics should be lowercase.'
     # BEGIN PROBLEM 2
-    "*** YOUR CODE HERE ***"
+    def about_func(paragraph):
+        words = split(lower(remove_punctuation(paragraph)))
+        print('DEBUG:', words)
+        for word in words:
+            if word in topic:
+                return True
+        return False
+    return about_func
     # END PROBLEM 2
 
 
@@ -56,7 +67,13 @@ def accuracy(typed, reference):
     typed_words = split(typed)
     reference_words = split(reference)
     # BEGIN PROBLEM 3
-    "*** YOUR CODE HERE ***"
+    right_count = 0
+    for typed_word, reference_word in zip(typed_words, reference_words):
+        if typed_word == reference_word:
+            right_count += 1
+    if not typed_words:
+        return 0.0
+    return right_count / len(typed_words) * 100
     # END PROBLEM 3
 
 
@@ -64,7 +81,7 @@ def wpm(typed, elapsed):
     """Return the words-per-minute (WPM) of the TYPED string."""
     assert elapsed > 0, 'Elapsed time must be positive'
     # BEGIN PROBLEM 4
-    "*** YOUR CODE HERE ***"
+    return len(typed) / 5 * 60 / elapsed
     # END PROBLEM 4
 
 
