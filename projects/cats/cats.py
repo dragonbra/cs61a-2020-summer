@@ -1,5 +1,6 @@
 """Typing test implementation"""
 
+from enum import auto
 from os import remove
 from utils import *
 from ucb import main, interact, trace
@@ -93,12 +94,12 @@ def autocorrect(user_word, valid_words, diff_function, limit):
     # BEGIN PROBLEM 5
     if user_word in valid_words:
         return user_word
-
-    closest_word = min(valid_words, key=lambda valid_word: diff_function(user_word, valid_word, limit))
-    if diff_function(user_word, closest_word, limit) > limit:
+    words_diff = [diff_function(user_word, w, limit) for w in valid_words]
+    similar_word, similar_diff = min(zip(valid_words, words_diff), key=lambda item: item[1])
+    if similar_diff > limit:
         return user_word
     else:
-        return closest_word
+        return similar_word
     # END PROBLEM 5
 
 
@@ -274,7 +275,20 @@ def key_distance_diff(start, goal, limit):
     goal = goal.lower() #converts the string to lowercase
 
     # BEGIN PROBLEM EC1
-    "*** YOUR CODE HERE ***"
+    if limit < 0:
+        return float('inf')
+    elif len(start) == 0 or len(goal) == 0:
+        return len(start) + len(goal)
+    elif start[0] == goal[0]:
+        return key_distance_diff(start[1:], goal[1:], limit)
+    else:
+        add_diff = 1 + key_distance_diff(start, goal[1:], limit - 1)
+        remove_diff = 1 + key_distance_diff(start[1:], goal, limit - 1)
+
+        dis = key_distance[(start[0], goal[0])]
+        substitute_diff = dis + key_distance_diff(start[1:], goal[1:], limit - 1)
+
+        return min(add_diff, remove_diff, substitute_diff)
     # END PROBLEM EC1
 
 def memo(f):
@@ -287,14 +301,29 @@ def memo(f):
         return cache[args]
     return memoized
 
+key_distance_diff = memo(key_distance_diff)
 key_distance_diff = count(key_distance_diff)
-
+memo_dic = {}
 
 def faster_autocorrect(user_word, valid_words, diff_function, limit):
     """A memoized version of the autocorrect function implemented above."""
 
     # BEGIN PROBLEM EC2
-    "*** YOUR CODE HERE ***"
+    mark = tuple([user_word, diff_function])
+    if user_word in valid_words:
+        return user_word
+    if mark in memo_dic and memo_dic[mark] in valid_words:
+        return memo_dic[mark]
+    else:
+        words_diff = [diff_function(user_word, w, limit) for w in valid_words]
+        similar_word, similar_diff = min(zip(valid_words, words_diff), key=lambda item: item[1])
+        # print("DEBUG:", similar_word)
+        if similar_diff > limit:
+            memo_dic[mark] = user_word
+            return user_word
+        else:
+            memo_dic[mark] = similar_word
+            return similar_word
     # END PROBLEM EC2
 
 
